@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<h2>Edit Task</h2>
+
+<form method="POST">
+{% csrf_token %}
+
+<div class="mb-3">
+<label>Task name</label>
+
+<input
+type="text"
+class="form-control"
+name="title"
+value="{{ task.title }}"
+required>
+
+</div>
+
+<div class="mb-3">
+<label>Priority</label>
+
+<select class="form-select" name="priority">
+
+<option value="H" {% if task.priority == "H" %}selected{% endif %}>High</option>
+<option value="M" {% if task.priority == "M" %}selected{% endif %}>Medium</option>
+<option value="L" {% if task.priority == "L" %}selected{% endif %}>Low</option>
+
+</select>
+</div>
+
+<button class="btn btn-primary">Update Task</button>
+<a href="/" class="btn btn-secondary">Back</a>
+
+</form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<h2 class="text-center mb-4">My ToDo List</h2>
+
+
+
+
+
+
+<!-- ADD TASK FORM -->
+
+<form method="POST" class="row g-2 mb-4">
+
+{% csrf_token %}
+
+<div class="col-md-4">
+<input 
+class="form-control"
+type="text"
+name="title"
+placeholder="Enter task..."
+required
+>
+</div>
+
+<div class="col-md-3">
+<input
+class="form-control"
+type="date"
+name="deadline"
+>
+</div>
+
+<div class="col-md-3">
+
+<select class="form-select" name="priority">
+
+<option value="H">High</option>
+<option value="M" selected>Medium</option>
+<option value="L">Low</option>
+
+</select>
+
+</div>
+
+<div class="col-md-2">
+
+<button class="btn btn-primary w-100">
+Add Task
+</button>
+
+</div>
+
+</form>
+
+
+<!-- SEARCH -->
+
+<form method="GET" class="mb-3">
+
+<input
+class="form-control"
+type="text"
+name="q"
+placeholder="Search task..."
+>
+
+</form>
+
+
+<!-- FILTER BUTTONS -->
+
+<div class="mb-3">
+
+<a class="btn btn-secondary btn-sm" href="/">All</a>
+
+<a class="btn btn-success btn-sm" href="?status=completed">
+Completed
+</a>
+
+<a class="btn btn-warning btn-sm" href="?status=pending">
+Pending
+</a>
+
+</div>
+
+
+<!-- TASK LIST -->
+
+<ul id="task-list" class="list-group">
+
+{% for task in tasks %}
+
+<li class="list-group-item task-item d-flex justify-content-between align-items-center
+{% if task.completed %} list-group-item-success{% endif %}
+{% if task.deadline and task.deadline < today %}bg-danger text-white{% endif %}"
+data-id="{{ task.id }}"
+>
+
+<div>
+{% if task.completed %}
+<s>{{task.title}}</s>
+{% else %}
+{{task.title}}
+{% endif %}
+<br>
+<small>
+Deadline: {{task.deadline}} |
+Priority:
+<span
+{% if task.priority == "H" %}class="text-danger"{% endif %}
+{% if task.priority == "M" %}class="text-warning"{% endif %}
+{% if task.priority == "L" %}class="text-success"{% endif %}>
+{{task.get_priority_display}}
+</span>
+</small>
+</div>
+
+<div>
+<a class="btn btn-success btn-sm" href="/complete/{{task.id}}/">✔</a>
+<a class="btn btn-primary btn-sm" href="{% url 'edit_task' task.id %}">Edit</a>
+<a class="btn btn-danger btn-sm" href="/delete/{{task.id}}/">Delete</a>
+</div>
+
+</li>
+
+{% empty %}
+<li class="list-group-item text-center">No tasks yet</li>
+{% endfor %}
+
+</ul>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+
+
+<script>
+
+const el = document.getElementById('task-list');
+
+new Sortable(el, {
+    animation: 150,
+
+    onEnd: function () {
+
+        const items = document.querySelectorAll('.task-item');
+        let order = [];
+
+        items.forEach((item, index) => {
+            order.push({
+                id: item.dataset.id,
+                order: index
+            });
+        });
+
+        fetch("/update-order/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify(order)
+        });
+
+    }
+});
+
+</script>
+
+{% endblock %}
