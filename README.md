@@ -29,7 +29,7 @@ This is a simple Todo application where users can create, edit and delete tasks 
 
 1. Clone the repository
 
-git clone https://github.com/username/todo-app.git
+git clone https://github.com/bexruz0708/todo-app.git
 
 2. Install dependencies
 
@@ -41,4 +41,5 @@ npm start
 
 ## Author
 
-- GitHub: https://github.com/githun0708
+- GitHub: https://github.com/bexruz0708
+- 
